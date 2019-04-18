@@ -184,6 +184,7 @@ namespace WebStore.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")

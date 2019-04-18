@@ -19,5 +19,6 @@ namespace WebStore.Models
 
         public string imageUrl { get; set; }
 
+        public float Discount { get; set; }
     }
 }

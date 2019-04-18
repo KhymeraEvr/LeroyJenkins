@@ -2,3 +2,42 @@
     ViewData["Title"] = "Home Page";
 }
 
+@model ProductsDisplayModel
+<script src="~/js/ProductsList.js"></script>
+<link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+<link href="~/css/site.css" rel="stylesheet" />
+<script src="~/lib/jquery/dist/jquery.js"></script>
+@if (@Context.User.IsInRole("Admin"))
+{
+    <script>
+        addAdminContent();
+    </script>
+
+}
+
+
+<div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+    @{
+        foreach (var prod in Model.Products)
+        {
+            <div style="padding: 25px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; ">
+                <div>
+                    <img src="@prod.imageUrl" alt="Card image cap">
+                </div>
+                <div style="padding-top: 10px">
+                    <span class="badge badge-danger" style="font-size: 18px; background-color:#28a745">@prod.Price $</span>
+                    <a href="#" class="btn btn-danger" onclick="addToCart(this)" data-assigned-id="@prod.Name">Add to cart</a>
+                    @if (@Context.User.IsInRole("Admin"))
+                    {
+                        <a href="#" class="btn btn-danger" onclick="removeProd(this)" data-assigned-id="@prod.Name">Delete</a>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<div style="padding-left: 500px">
+<a href="javascript:prevPage()"class="btn"  onclick="" id="btn_prev">Prev</a>
+<a href="javascript:nextPage()" class="btn"id="btn_next">Next</a>
+</div>

@@ -1,0 +1,91 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model CartViewModel
+
+<script src="~/js/ProductsList.js"></script>
+<link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+<link href="~/css/site.css" rel="stylesheet" />
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title"><a>Products</a></h4>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Discount</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+       <tbody>
+           
+
+            @{
+                foreach (var prod in Model.Orders)
+                {
+                    int count = 1;
+
+                    if (prod.Status == Status.Active)
+                    {
+                        <tr>
+                            <td scope="row">
+                                @{ count++; }
+                            </td>
+                            <td>@prod.Product.Name</td>
+                            <td>@prod.Product.Price</td>
+                            <td>@prod.Product.Discount</td>
+                            <td>@prod.Status</td>
+                        </tr>
+                    }
+                }
+            }
+            </tbody>
+            </table>
+            <div class="row">
+                <div class="col">
+                    <h3><span title="Total Price" class="badge badge-success">Total Price @Model.TotalSum $</span></h3>
+                </div>
+            </div>
+            <h4 class="card-title"><a>History</a></h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Discount</th>
+                        <th scope="col">Status</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var prod in Model.Orders)
+                        {
+                            int count = 1;
+
+                            if (prod.Status != Status.Active)
+                            {
+                                <tr>
+                                    <th scope="row">
+                                        @{ count++; }
+                                    </th>
+                                    <td>@prod.Product.Name</td>
+                                    <td>@prod.Product.Price</td>
+                                    <td>@prod.Product.Discount</td>
+                                    <td>@prod.Status</td>
+
+                                </tr>
+                            }
+                        }
+                    }
+                }
+                
+        </div>
