@@ -26,5 +26,7 @@ namespace WebStore.Models
         }
         public virtual DbSet<Order> Orders { get; set; }
 
+        public virtual DbSet<Calcmodel> Gauses { get; set; }
+
     }
 }

@@ -20,5 +20,6 @@ namespace WebStore.Data.Repositpry
         IEnumerable<Order> GetUserOrders(string name);
         Task UpdateOrder(Order order);
         Task UpdateProduct(Product prod);
+        ProductDbContext Context { get; }
     }
 }

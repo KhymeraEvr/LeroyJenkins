@@ -38,6 +38,7 @@ namespace WebStore
             });
 
             services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddSingleton(new GausHub());
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
@@ -58,6 +59,8 @@ namespace WebStore
                 opt.UseSqlServer(Configuration.GetConnectionString("ProdConnection")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSignalR();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,6 +77,10 @@ namespace WebStore
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<GausHub>("/chat");
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

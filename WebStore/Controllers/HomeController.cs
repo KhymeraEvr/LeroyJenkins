@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using WebStore.Data.Repositpry;
 using WebStore.Models;
 
@@ -14,10 +15,10 @@ namespace WebStore.Controllers
     public class HomeController : Controller
     {
         private readonly IProductRepository _products;
-
-        public HomeController(IProductRepository products)
+        private IHubContext<GausHub> _hub;
+        public HomeController(IProductRepository products, IHubContext<GausHub> hub)
         {
-
+            _hub = hub;
             _products = products;
         }
         
@@ -144,6 +145,123 @@ namespace WebStore.Controllers
                 default: throw new InvalidOperationException();
 
             }
+        }
+
+        //[HttpPost("Home/startCalc/{size}")]
+        public IActionResult RunGaus([FromForm]Calcmodel model )
+        {
+            var server1load = _products.Context.Gauses.Where(g => g.server == 1 && g.isActive)?.Sum(f => f.size) ?? 0;
+            var server2load = _products.Context.Gauses.Where(g => g.server == 2 && g.isActive)?.Sum(f => f.size) ?? 0;
+
+            if (server1load > server2load)
+            {
+                return Redirect("http://funnypicture.org/wallpaper/2015/04/funny-black-cat-pictures-16-cool-wallpaper.jpg");
+
+            }
+            return RedirectToAction("Calculate", new { size = model.size, name = User.Identity.Name });
+        }
+
+        [HttpGet("Home/getHistory")]
+        public IActionResult GetHistory()
+        {
+            var history = _products.Context.Gauses.ToList();
+            return Ok(history);
+        }
+
+        public async Task<IActionResult> Calculate(int Size, string Name)
+        {
+            var args = new Calcmodel
+            {
+                server = 1,
+                name = Name,
+                size = Size,
+                isActive = true
+            };
+
+            var model = await _products.Context.Gauses.AddAsync(args);
+            var calcMod = model.Entity;
+             await _products.Context.SaveChangesAsync();
+
+            await Task.Run(() => Main(args.size, args.name)).ConfigureAwait(false);
+
+            calcMod.isActive = false;
+            _products.Context.Update(calcMod);
+            await _products.Context.SaveChangesAsync();
+            return View("CalcPage");
+
+        }
+
+        public IActionResult CalcPage()
+        {
+            return View();
+        }
+
+        public async Task Send(string name, string message)
+        {
+
+            await _hub.Clients.All.SendAsync("Send", name, message);
+        }
+
+
+        public async Task Main(int n, string name)
+        {
+            double[,] mat = new double[n, n];
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (i == j)
+                    {
+                        mat[i, j] = i + 1;
+                    }
+                    else
+                    {
+                        mat[i, j] = i + 2;
+                    }
+                }
+            }
+            double[] free = new double[n];
+            for (int i = 1; i <= n; i++)
+            {
+                free[i - 1] = 7;
+            }
+            await Gauss(name, mat, free, n);
+        }
+
+        public async Task<double[]> Gauss(string name, double[,] mat, double[] free, int n)
+        {
+            float progressStep = 100 / (float)n;
+            float progres = 0;
+            double[] x = new double[n];
+            for (int i = 0; i < n; i++)
+            {
+                double val = mat[i, i];
+                for (int j = i; j < n; j++)
+                {
+                    double koef = mat[j, i] / val;
+                    for (int q = i; q < n; q++)
+                    {
+                        if (j != i)
+                        {
+                            mat[j, q] -= mat[i, q] * koef;
+                        }
+                    }
+                }
+                progres += progressStep;
+                await Send(name, progres.ToString());
+                await Task.Delay(100);
+            }
+
+            for (int i = n - 1; i >= 0; i--)
+            {
+                x[i] = free[i];
+                for (int j = 0; j < i; j++)
+                {
+                    free[j] -= x[i] * mat[j, i];
+                }
+            }
+            await Send(name, "100");
+            return x;
         }
     }
 }

@@ -9,7 +9,9 @@ namespace WebStore.Data.Repositpry
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly ProductDbContext _context;
+        public readonly ProductDbContext _context;
+
+        public ProductDbContext Context => _context;
 
         public ProductRepository(ProductDbContext context)
         {

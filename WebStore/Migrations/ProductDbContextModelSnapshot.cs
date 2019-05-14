@@ -19,6 +19,25 @@ namespace WebStore.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("WebStore.Models.Calcmodel", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("isActive");
+
+                    b.Property<string>("name");
+
+                    b.Property<int>("server");
+
+                    b.Property<int>("size");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Gauses");
+                });
+
             modelBuilder.Entity("WebStore.Models.Order", b =>
                 {
                     b.Property<int>("Id")
